@@ -1,0 +1,174 @@
+#!/bin/bash
+
+# 원격 접속 취약점 점검
+# Check /etc/hosts.equiv 파일 경로 확인 U-17
+if [ -e "/etc/hosts.equiv" ]; then
+    # Check /etc/hosts.equiv root 소유권 확인
+    if [ $(stat -c "%U" /etc/hosts.equiv) = "root" ]; then
+        echo "/etc/hosts.equiv 파일 소유자가 root 계정임 안전."
+    else
+        echo "/etc/hosts.equiv 파일 소유자가 root 계정이 아님 취약."
+    fi
+
+    # Check /etc/hosts.equiv 파일 권한 확인
+    if [ $(stat -c "%a" /etc/hosts.equiv) -lt 600 ]; then
+        echo "/etc/hosts.equiv 권한이 600미만임 안전."
+    else
+        echo "/etc/hosts.equiv 권한이 600이상 취약."
+    fi
+
+    # Check /etc/hosts.equiv '+' 설정 확인
+    if grep -q "+" /etc/hosts.equiv; then
+        echo "/etc/hosts.equiv '+' 설정 되어있다 취약."
+    else
+        echo "/etc/hosts.equiv '+' 설정이 되어있지 않다 안전."
+    fi
+else
+    echo "/etc/hosts.equiv 파일이 존재하지 않는다 안전."
+fi
+
+# Check if $HOME/.rhosts 파일 확인
+if [ -e "$HOME/.rhosts" ]; then
+    # Check $HOME/.rhosts root 소유권 확인
+    if [ $(stat -c "%U" "$HOME/.rhosts") = "root" ]; then
+        echo "$HOME/.rhosts 파일 소유자가 root 계정임 안전."
+    else
+        echo "$HOME/.rhosts 파일 소유자가 root 계정이 아님 취약."
+    fi
+
+    # Check $HOME/.rhosts 파일 권한 확인
+    if [ $(stat -c "%a" "$HOME/.rhosts") -lt 600 ]; then
+        echo "$HOME/.rhosts 파일 권한이 600미만 안전."
+    else
+        echo "$HOME/.rhosts 파일 권한이 600이상 취약."
+    fi
+
+    # Check $HOME/.rhosts '+' 설정 확인
+    if grep -q "+" "$HOME/.rhosts"; then
+        echo "$HOME/.rhosts '+' 설정되어있다 취약."
+    else
+        echo "$HOME/.rhosts '+' 설정이 되어있지 않다 안전."
+    fi
+else
+    echo "$HOME/.rhosts 파일이 존재하지 않음 안전."
+fi
+
+
+# Check TCP Wrapper 프로그램 실행중인지 확인 U-18
+if [[ $(sudo systemctl is-active tcpd) == "active" ]]; then
+    echo "TCP Wrapper 프로그램 실행중 안전."
+    exit 0
+fi
+
+# Check IPFilter 프로그램 실행중인지 확인
+if [[ $(sudo systemctl is-active ipfilter) == "active" ]]; then
+    echo "IPFilter 프로그램 실행중 안전."
+    exit 0
+fi
+
+# Check IPtables 프로그램 실행중인지 확인
+if [[ $(sudo systemctl is-active iptables) == "active" ]]; then
+    echo "IPtables 프로그램 실행중 안전."
+    exit 0
+fi
+
+echo "IP 및 포트 제한 프로그램이 실행중이 아님 취약."
+
+
+# Check finger 서비스 비활성화 여부 U-19
+if [[ $(systemctl is-active finger) == "inactive" ]]; then
+    echo "finger 서비스 비활성화 되어있다 안전."
+else
+    echo "finger 서비스가 활성화 되어있다 취약."
+fi
+
+
+
+# Check if anonymous FTP is disabled U-20
+if grep -q "anonymous_enable=NO" /etc/vsftpd.conf; then
+  echo "Anonymous FTP is 비활성화 되었다. 안전"
+else
+  echo "Anonymous FTP is 활성화 되었다. 취약"
+fi
+
+# Check if r-command 서비스 비활성화 여부 U-21
+if [[ $(systemctl is-active rsh.socket) == "inactive" && $(systemctl is-active rlogin.socket) == "inactive" && $(systemctl is-active rexec.socket) == "inactive" ]]; then
+    echo "r-command 서비스 (rlogin, rsh, and rexec) 비활성화 되어있음 안전."
+else
+    echo "r-command 서비스 (rlogin, rsh, and rexec) 활성화 되어있음 취약."
+fi
+
+# Check crontab 파일 소유자 권한 확인 U-22
+if [[ -f /etc/crontab ]]; then
+    crontab_permission=$(stat -c "%a" /etc/crontab)
+
+    if (( crontab_permission > 640 )); then
+        echo "/etc/crontab 640 이하 취약하다. Permission is set to $crontab_permission."
+    else
+        echo "/etc/crontab 640 이상 안전하다. Permission is set to $crontab_permission."
+    fi
+
+else
+    echo "/etc/crontab 파일이 존재하지 않음 안전."
+fi
+
+# Check cron 디렉토리
+cron_dirs=("/etc/cron.daily" "/etc/cron.weekly" "/etc/cron.monthly" "/etc/cron.hourly")
+
+for cron_dir in "${cron_dirs[@]}"; do
+    if [[ -d "$cron_dir" ]]; then
+        cron_files=("$cron_dir"/*)
+
+        for cron_file in "${cron_files[@]}"; do
+            cron_permission=$(stat -c "%a" "$cron_file")
+
+            if (( cron_permission > 640 )); then
+                echo "$cron_file 취약하다. Permission is set to $cron_permission."
+            else
+                echo "$cron_file 안전하다. Permission is set to $cron_permission."
+            fi
+        done
+
+    else
+        echo "$cron_dir 디렉토리가 존재하지않음 안전."
+    fi
+done
+
+#Dos 공격에 취약한 서비스 비활성화 확인 U-23
+services=("echo" "discard" "daytime" "chargen" "ntp" "snmp")
+
+for service in "${services[@]}"; do
+    # Check 서비스가 실행중이면
+    if [[ $(systemctl is-active "$service") == "active" ]]; then
+        echo "Disabling $service service..."
+        
+        # 서비스가 활성화 상태이면 중지해야하는 메시지 출력
+        echo "$service service is active. Stopping the service..."
+        
+        # Uncomment the following lines to stop the service
+        # sudo systemctl stop "$service"
+        # echo "$service service has been stopped."
+        
+        # Disable the service
+        sudo systemctl disable "$service"
+        
+        echo "$service service has been disabled."
+    else
+        echo "$service service is not running."
+    fi
+done
+
+# Check NFS 서비스 비활성화 확인 U-24
+if [[ $(systemctl is-active nfs-server) == "active" || $(systemctl is-active nfs-kernel-server) == "active" ]]; then
+    echo "NFS 서비스 활성화 되어있음 취약."
+else
+    echo "NFS 서비스 비활성화 되었음 안전."
+fi
+
+
+# Check NFS 서비스 접근 통제 U-25
+if [[ $(grep -E "^( *)/ *( +)(.*)$" /etc/exports) =~ " *(no_root_squash|root_squash|all_squash) " ]]; then
+    echo "NFS 서비스 접근통제가 되어 있지 않음. everyone 공유가 제한되지 않음 취약."
+else
+    echo "NFS 서비스 접근통제 중. everyone 공유가 제한됨 안전."
+fi
