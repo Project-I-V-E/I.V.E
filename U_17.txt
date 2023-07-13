@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# 원격 접속 취약점 점검
+# Check /etc/hosts.equiv 파일 경로 확인 U-17
+if [ -e "/etc/hosts.equiv" ]; then
+    # Check /etc/hosts.equiv root 소유권 확인
+    if [ $(stat -c "%U" /etc/hosts.equiv) = "root" ]; then
+        echo "/etc/hosts.equiv 파일 소유자가 root 계정임 안전."
+    else
+        echo "/etc/hosts.equiv 파일 소유자가 root 계정이 아님 취약."
+    fi
+
+    # Check /etc/hosts.equiv 파일 권한 확인
+    if [ $(stat -c "%a" /etc/hosts.equiv) -lt 600 ]; then
+        echo "/etc/hosts.equiv 권한이 600미만임 안전."
+    else
+        echo "/etc/hosts.equiv 권한이 600이상 취약."
+    fi
+
+    # Check /etc/hosts.equiv '+' 설정 확인
+    if grep -q "+" /etc/hosts.equiv; then
+        echo "/etc/hosts.equiv '+' 설정 되어있다 취약."
+    else
+        echo "/etc/hosts.equiv '+' 설정이 되어있지 않다 안전."
+    fi
+else
+    echo "/etc/hosts.equiv 파일이 존재하지 않는다 안전."
+fi
+
+# Check if $HOME/.rhosts 파일 확인
+if [ -e "$HOME/.rhosts" ]; then
+    # Check $HOME/.rhosts root 소유권 확인
+    if [ $(stat -c "%U" "$HOME/.rhosts") = "root" ]; then
+        echo "$HOME/.rhosts 파일 소유자가 root 계정임 안전."
+    else
+        echo "$HOME/.rhosts 파일 소유자가 root 계정이 아님 취약."
+    fi
+
+    # Check $HOME/.rhosts 파일 권한 확인
+    if [ $(stat -c "%a" "$HOME/.rhosts") -lt 600 ]; then
+        echo "$HOME/.rhosts 파일 권한이 600미만 안전."
+    else
+        echo "$HOME/.rhosts 파일 권한이 600이상 취약."
+    fi
+
+    # Check $HOME/.rhosts '+' 설정 확인
+    if grep -q "+" "$HOME/.rhosts"; then
+        echo "$HOME/.rhosts '+' 설정되어있다 취약."
+    else
+        echo "$HOME/.rhosts '+' 설정이 되어있지 않다 안전."
+    fi
+else
+    echo "$HOME/.rhosts 파일이 존재하지 않음 안전."
+fi
