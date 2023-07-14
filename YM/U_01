@@ -1,0 +1,11 @@
+#!/bin/bash
+
+while IFS=":" read -r user password rest
+do
+    if [[ $password == "x" ]]; then
+        echo "True"
+        exit 0
+    fi
+done < /etc/passwd
+
+echo "False"

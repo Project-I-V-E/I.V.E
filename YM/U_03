@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# /etc/pam.d/common-auth 파일에서 pam_tally2.so 라인을 찾아 계정 잠금 임계값 확인
+grep -q 'pam_tally2.so' /etc/pam.d/common-auth
+
+if [ $? -eq 0 ]; then
+  # pam_tally2.so 라인이 존재하는 경우
+  # 계정 잠금 임계값 확인
+  deny=$(grep -Po 'deny=\K\d+' /etc/pam.d/common-auth)
+  
+  if [ -n "$deny" ] && [ "$deny" -le 10 ]; then
+    # 잠금 임계값이 10회 이하로 설정된 경우
+    echo "True"
+  else
+    # 잠금 임계값이 설정되지 않거나 10회 이상인 경우
+    echo "False"
+  fi
+else
+  # pam_tally2.so 라인이 존재하지 않는 경우
+  echo "False"
+fi

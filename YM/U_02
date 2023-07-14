@@ -1,0 +1,21 @@
+#!/bin/bash
+
+rhel_version=$(cat /etc/redhat-release | awk '{print $7}' | cut -c 1)
+
+if [ "$rhel_version" == "5" ]; then
+    password_file="/etc/pam.d/system-auth"
+elif [ "$rhel_version" == "7" ]; then
+    password_file="/etc/security/pwquality.conf"
+else
+    echo "Unsupported RHEL version."
+    exit 1
+fi
+
+if grep -q "password.*requisite.*pam_cracklib.so" "$password_file" && \
+   grep -q "minlen=[8-9]" "$password_file" && \
+   grep -Eq "dcredit=.*ucredit=.*lcredit=.*ocredit=.*minclass=.*" "$password_file" && \
+   grep -q "minclass=4" "$password_file"; then
+    echo "True"
+else
+    echo "False"
+fi
