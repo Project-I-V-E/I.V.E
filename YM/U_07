@@ -1,0 +1,13 @@
+#!/bin/bash
+#!/bin/bash
+
+owner=$(stat -c "%U" /etc/passwd)
+permission=$(stat -c "%a" /etc/passwd)
+
+if [ "$owner" != "root" ]; then
+    echo "false"
+elif [ "$permission" -gt 644 ]; then
+    echo "false"
+else
+    echo "true"
+fi

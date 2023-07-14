@@ -1,0 +1,10 @@
+#!/bin/bash
+
+SHADOWFILE="/etc/shadow"
+OWNER=$(stat -c "%U" "$SHADOWFILE")
+
+if [ "$OWNER" = "root" ]; then
+  echo "false"
+else
+  echo "true"
+fi
