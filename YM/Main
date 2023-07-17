@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# U_01.sh부터 U_10.sh까지 실행하는 스크립트
+for ((i=1; i<=10; i++)); do
+    filename="U_$(printf "%02d" $i).sh"
+    if [[ -f "$filename" ]]; then
+        echo "Executing $filename..."
+        bash "$filename"
+        echo "$filename executed."
+        echo
+    else
+        echo "$filename not found. Skipping..."
+        echo
+    fi
+done
