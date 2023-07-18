@@ -53,4 +53,4 @@ else
     echo "$HOME/.rhosts 파일이 존재하지 않음 안전."
 fi
 
-echo "$(./bacup4)" > result.txt
+echo "$(./bacup4)" >> result.txt

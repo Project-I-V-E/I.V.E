@@ -7,4 +7,4 @@ else
     echo "NFS 서비스 접근통제 중. everyone 공유가 제한됨 안전."
 fi
 
-echo "$(./bacup4)" > result.txt
+echo "$(./bacup4)" >> result.txt

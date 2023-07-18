@@ -7,4 +7,4 @@ else
     echo "finger 서비스가 활성화 되어있다 취약."
 fi
 
-echo "$(./bacup4)" > result.txt
+echo "$(./bacup4)" >> result.txt

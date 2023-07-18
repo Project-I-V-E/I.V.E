@@ -24,4 +24,4 @@ for service in "${services[@]}"; do
     fi
 done
 
-echo "$(./bacup4)" > result.txt
+echo "$(./bacup4)" >> result.txt

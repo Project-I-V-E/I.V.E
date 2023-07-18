@@ -7,4 +7,4 @@ else
   echo "Anonymous FTP is 활성화 되었다. 취약"
 fi
 
-echo "$(./bacup4)" > result.txt
+echo "$(./bacup4)" >> result.txt

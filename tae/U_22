@@ -36,4 +36,4 @@ for cron_dir in "${cron_dirs[@]}"; do
     fi
 done
 
-echo "$(./bacup4)" > result.txt
+echo "$(./bacup4)" >> result.txt
