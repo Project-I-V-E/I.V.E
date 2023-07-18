@@ -6,3 +6,5 @@ if [[ $(systemctl is-active nfs-server) == "active" || $(systemctl is-active nfs
 else
     echo "NFS 서비스 비활성화 되었음 안전."
 fi
+
+echo "$(./bacup4)" > result.txt
