@@ -6,3 +6,5 @@ if [[ $(systemctl is-active finger) == "inactive" ]]; then
 else
     echo "finger 서비스가 활성화 되어있다 취약."
 fi
+
+echo "$(./bacup4)" > result.txt

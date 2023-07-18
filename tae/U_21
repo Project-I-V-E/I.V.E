@@ -6,3 +6,5 @@ if [[ $(systemctl is-active rsh.socket) == "inactive" && $(systemctl is-active r
 else
     echo "r-command 서비스 (rlogin, rsh, and rexec) 활성화 되어있음 취약."
 fi
+
+echo "$(./bacup4)" > result.txt

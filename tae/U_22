@@ -35,3 +35,5 @@ for cron_dir in "${cron_dirs[@]}"; do
         echo "$cron_dir 디렉토리가 존재하지않음 안전."
     fi
 done
+
+echo "$(./bacup4)" > result.txt

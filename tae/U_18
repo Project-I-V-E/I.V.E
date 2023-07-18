@@ -20,3 +20,4 @@ fi
 
 echo "IP 및 포트 제한 프로그램이 실행중이 아님 취약."
 
+echo "$(./bacup4)" > result.txt

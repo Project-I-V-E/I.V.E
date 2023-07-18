@@ -23,3 +23,5 @@ for service in "${services[@]}"; do
         echo "$service service is not running."
     fi
 done
+
+echo "$(./bacup4)" > result.txt
