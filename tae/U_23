@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#Dos 공격에 취약한 서비스 비활성화 확인 U-23
+services=("echo" "discard" "daytime" "chargen" "ntp" "snmp")
+
+for service in "${services[@]}"; do
+    # Check 서비스가 실행중이면
+    if [[ $(systemctl is-active "$service") == "active" ]]; then
+        echo "Disabling $service service..."
+        
+        # 서비스가 활성화 상태이면 중지해야하는 메시지 출력
+        echo "$service service is active. Stopping the service..."
+        
+        # Uncomment the following lines to stop the service
+        # sudo systemctl stop "$service"
+        # echo "$service service has been stopped."
+        
+        # Disable the service
+        sudo systemctl disable "$service"
+        
+        echo "$service service has been disabled."
+    else
+        echo "$service service is not running."
+    fi
+done

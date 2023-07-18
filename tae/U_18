@@ -1,0 +1,22 @@
+#!/bin/bash
+
+ Check TCP Wrapper 프로그램 실행중인지 확인 U-18
+if [[ $(sudo systemctl is-active tcpd) == "active" ]]; then
+    echo "TCP Wrapper 프로그램 실행중 안전."
+    exit 0
+fi
+
+# Check IPFilter 프로그램 실행중인지 확인
+if [[ $(sudo systemctl is-active ipfilter) == "active" ]]; then
+    echo "IPFilter 프로그램 실행중 안전."
+    exit 0
+fi
+
+# Check IPtables 프로그램 실행중인지 확인
+if [[ $(sudo systemctl is-active iptables) == "active" ]]; then
+    echo "IPtables 프로그램 실행중 안전."
+    exit 0
+fi
+
+echo "IP 및 포트 제한 프로그램이 실행중이 아님 취약."
+

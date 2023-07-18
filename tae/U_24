@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Check NFS 서비스 비활성화 확인 U-24
+if [[ $(systemctl is-active nfs-server) == "active" || $(systemctl is-active nfs-kernel-server) == "active" ]]; then
+    echo "NFS 서비스 활성화 되어있음 취약."
+else
+    echo "NFS 서비스 비활성화 되었음 안전."
+fi

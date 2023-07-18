@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Check if anonymous FTP is disabled U-20
+if grep -q "anonymous_enable=NO" /etc/vsftpd.conf; then
+  echo "Anonymous FTP is 비활성화 되었다. 안전"
+else
+  echo "Anonymous FTP is 활성화 되었다. 취약"
+fi

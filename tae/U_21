@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Check if r-command 서비스 비활성화 여부 U-21
+if [[ $(systemctl is-active rsh.socket) == "inactive" && $(systemctl is-active rlogin.socket) == "inactive" && $(systemctl is-active rexec.socket) == "inactive" ]]; then
+    echo "r-command 서비스 (rlogin, rsh, and rexec) 비활성화 되어있음 안전."
+else
+    echo "r-command 서비스 (rlogin, rsh, and rexec) 활성화 되어있음 취약."
+fi

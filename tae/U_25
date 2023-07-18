@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Check NFS 서비스 접근 통제 U-25
+if [[ $(grep -E "^( *)/ *( +)(.*)$" /etc/exports) =~ " *(no_root_squash|root_squash|all_squash) " ]]; then
+    echo "NFS 서비스 접근통제가 되어 있지 않음. everyone 공유가 제한되지 않음 취약."
+else
+    echo "NFS 서비스 접근통제 중. everyone 공유가 제한됨 안전."
+fi

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Check finger 서비스 비활성화 여부 U-19
+if [[ $(systemctl is-active finger) == "inactive" ]]; then
+    echo "finger 서비스 비활성화 되어있다 안전."
+else
+    echo "finger 서비스가 활성화 되어있다 취약."
+fi

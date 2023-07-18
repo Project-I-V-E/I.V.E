@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Check crontab 파일 소유자 권한 확인 U-22
+if [[ -f /etc/crontab ]]; then
+    crontab_permission=$(stat -c "%a" /etc/crontab)
+
+    if (( crontab_permission > 640 )); then
+        echo "/etc/crontab 640 이하 취약하다. Permission is set to $crontab_permission."
+    else
+        echo "/etc/crontab 640 이상 안전하다. Permission is set to $crontab_permission."
+    fi
+
+else
+    echo "/etc/crontab 파일이 존재하지 않음 안전."
+fi
+
+# Check cron 디렉토리
+cron_dirs=("/etc/cron.daily" "/etc/cron.weekly" "/etc/cron.monthly" "/etc/cron.hourly")
+
+for cron_dir in "${cron_dirs[@]}"; do
+    if [[ -d "$cron_dir" ]]; then
+        cron_files=("$cron_dir"/*)
+
+        for cron_file in "${cron_files[@]}"; do
+            cron_permission=$(stat -c "%a" "$cron_file")
+
+            if (( cron_permission > 640 )); then
+                echo "$cron_file 취약하다. Permission is set to $cron_permission."
+            else
+                echo "$cron_file 안전하다. Permission is set to $cron_permission."
+            fi
+        done
+
+    else
+        echo "$cron_dir 디렉토리가 존재하지않음 안전."
+    fi
+done
